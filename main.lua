@@ -24,6 +24,12 @@ function love.load()
 	-- blurry text & graphics, without this bilinear filtering would be used by default
 	love.graphics.setDefaultFilter('nearest', 'nearest')
 
+	-- a 'retro' styled font which can be used for any text used in the application
+	retroFont = love.graphics.newFont('font.ttf', 8)
+
+	-- sets LÖVE's active font to the one specified in the retroFont object
+	love.graphics.setFont(retroFont)
+
 	-- initialises the virutal resolution which is rendered within the actual window
 	-- regardless of its dimensions, replaces the love.window.setMode call previously used
 	push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, { 
@@ -49,9 +55,25 @@ function love.draw()
 	-- starts the rendering at the set virtual resolution
 	push:apply('start')
 
-	-- condensed into single line
-	-- now using the set virtual width and height for the text placement on the screen
-	love.graphics.printf('Hello Pong!', 0, VIRTUAL_HEIGHT / 2 - 6, VIRTUAL_WIDTH,'center')
+	-- clears the screen with a specified colour, chose a purple colour here cause it looked nice
+	love.graphics.clear(0.5, 0.51, 0.8, 1)
+
+	-- displays a welcome message near the top of the screen
+	love.graphics.printf('Hello Pong!', 0, 20, VIRTUAL_WIDTH,'center')
+
+	-- paddles are rectangles which are drawn on the screen at certain positions, this is true about the ball too
+
+	-- setting paddle & ball colour to pink
+	love.graphics.setColor(1, 0.75, 0.79)
+
+	-- renders the left side's paddle
+	love.graphics.rectangle('fill', 10, 30, 5, 20)
+
+	-- renders the right side's paddle
+	love.graphics.rectangle('fill', VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 50, 5, 20)
+
+	-- renders the ball in the center of the screen
+	love.graphics.rectangle('fill', VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
 
 	-- ends the rendering at the set virtual resolution
 	push:apply('end')
