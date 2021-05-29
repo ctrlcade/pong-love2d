@@ -72,7 +72,7 @@ function love.load()
 	-- regardless of its dimensions, replaces the love.window.setMode call previously used
 	push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, { 
 		fullscreen = false,
-		resizable = false,
+		resizable = true,
 		vsync = true
 	})
 
@@ -96,6 +96,12 @@ function love.load()
 	-- (used for the start, menus, main game, leaderboards, etc.), we'll use
 	-- this to determine behaviour during rendering and updating
 	gameState = 'start'
+end
+
+-- called by LÖVE whenever the screen is resizes, here we're just passing in the width
+-- and height to push so our virtual resolution can be resized as needed
+function love.resize(w, h)
+	push:resize(w, h)
 end
 
 --[[ runs with each frame and takes 'dt' as parameter which is the deltaTime 
