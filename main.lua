@@ -8,6 +8,20 @@ aesthetic
 -- https://github.com/Ulydev/push
 push = require 'push'
 
+-- the 'Class' library that is used here will allow us to represent anything in
+-- our game as code rather than keeping track of many variables and methods
+
+-- https://github.com/vrld/hump/blob/master/class.lua
+Class = require 'class'
+
+-- the Paddle class which stores the position and dimensions of each of the
+-- paddles and the logic for rendering them on screen
+require 'Paddle'
+
+-- the Ball class isn't much different from the Paddle class structure-wise but
+-- mechanically they function very differently
+require 'Ball'
+
 -- size of the window where the game is displayed
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -53,17 +67,13 @@ function love.load()
 	player1Score = 0
 	player2Score = 0
 
-	-- paddle positions are fixed to the Y axis so they can only move upwards or downwards
-	player1Y = 30
-	player2Y = VIRTUAL_HEIGHT - 50
+	-- initialises the player paddles, makes them global so they can be seen
+	-- by other functions/modules
+	player1 = Paddle(10, 30, 5, 20)
+	player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
 
-	-- velocity and position of the ball when the game begins
-	ballX = VIRTUAL_WIDTH / 2 - 2
-	ballY = VIRTUAL_HEIGHT / 2 - 2
-
-	-- math.random returns a randomised value between the 1st & 2nd parameter
-	ballDX = math.random(2) == 1 and 100 or -100
-	ballDY = math.random(-50, 50)
+	-- positions the vall in the middle of the screen
+	ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
 
 	-- game state variable which is used to transition to different play states
 	-- (used for the start, menus, main game, leaderboards, etc.), we'll use
@@ -77,32 +87,30 @@ that has elapsed since the last frame, this is already supplied by LÖVE
 function love.update(dt)
 	-- player 1 movement handling
 	if love.keyboard.isDown('w') then
-		-- add negative paddle speed (up = -Y) to the current Y multiplied by deltaTime (dt)
-		-- we clamp the position of the paddle between the bounds of the screen, math.max
-		-- returns the greater value of the two; 0 and player1Y ensures we dont go above it
-		player1Y = math.max(0, player1Y + -PADDLE_SPEED * dt)
+		player1.dy = -PADDLE_SPEED
 	elseif love.keyboard.isDown('s') then
-		-- add positive paddle speed (down = Y) to the current Y multiplied by deltaTime (dt)
-		-- math.min returns the lesser of the two values passed in, bottom of the edge minus
-		-- the paddle height and player1Y ensures we dont go below it
-		player1Y = math.min(VIRTUAL_HEIGHT - 20, player1Y + PADDLE_SPEED * dt)
+		player1.dy = PADDLE_SPEED
+	else
+		player1.dy = 0
 	end
 
 	-- player 2 movement handling
 	if love.keyboard.isDown('up') then
-		-- add negative paddle speed (up = -Y) to the current Y multiplied by deltaTime (dt)
-		player2Y = math.max(0, player2Y + -PADDLE_SPEED * dt)
+		player2.dy = -PADDLE_SPEED
 	elseif love.keyboard.isDown('down') then
-		-- add positive paddle speed (down = Y) to the current Y multiplied by deltaTime (dt)
-		player2Y = math.min(VIRTUAL_HEIGHT - 20, player2Y + PADDLE_SPEED * dt)
+		player2.dy = PADDLE_SPEED
+	else
+		player2.dy = 0
 	end
 
 	-- updates the ball based on its DX and DY values only if in the play state;
 	-- scales the velocity of the ball by deltaTime so its movement is framerate-independent
 	if gameState == 'play' then
-		ballX = ballX + ballDX * dt
-		ballY = ballY + ballDY * dt
+		ball:update(dt)
 	end
+
+	player1:update(dt)
+	player2:update(dt)
 end
 
 -- keyboard handling, called by LÖVE every frame and passes key pressed as parameter
@@ -119,15 +127,8 @@ function love.keypressed(key)
 		else
 			gameState = 'start'
 
-			-- the ball's position is initially in the middle of the screen
-			ballX = VIRTUAL_WIDTH / 2 - 2
-			ballY = VIRTUAL_HEIGHT / 2 - 2
-
-			-- given ball's x and y velocity is a random starting value
-			-- the and/or pattern used here is Lua's way of accomplishing
-			-- a ternary operation seen in other languages like C
-			ballDX = math.random(2) == 1 and 100 or -100
-			ballDY = math.random(-50, 50) * 1.5
+			-- ball's new reset method
+			ball:reset()
 		end
 	end
 end
@@ -162,14 +163,12 @@ function love.draw()
 	-- setting paddle & ball colour to pink
 	love.graphics.setColor(1, 0.75, 0.79)
 
-	-- renders the left side's paddle
-	love.graphics.rectangle('fill', 10, player1Y, 5, 20)
+	-- render paddles by using their class's render method
+	player1:render()
+	player2:render()
 
-	-- renders the right side's paddle
-	love.graphics.rectangle('fill', VIRTUAL_WIDTH - 10, player2Y, 5, 20)
-
-	-- renders the ball in the center of the screen
-	love.graphics.rectangle('fill', ballX, ballY, 4, 4)
+	-- render ball using its class's render method
+	ball:render()
 
 	-- ends the rendering at the set virtual resolution
 	push:apply('end')
