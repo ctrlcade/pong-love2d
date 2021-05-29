@@ -41,6 +41,9 @@ function love.load()
 	-- blurry text & graphics, without this bilinear filtering would be used by default
 	love.graphics.setDefaultFilter('nearest', 'nearest')
 
+	-- sets the title of the application window
+	love.window.setTitle('LÖVE-PONG')
+
 	-- seeds the random number generator so that calls to the random function are
 	-- always random, uses the current time as it'll be different every call
 	math.randomseed(os.time())
@@ -170,6 +173,17 @@ function love.draw()
 	-- render ball using its class's render method
 	ball:render()
 
+	-- function to show the FPS of the application in LÖVE
+	displayFPS()
+
 	-- ends the rendering at the set virtual resolution
 	push:apply('end')
+end
+
+-- renders the current FPS
+function displayFPS()
+	-- displays the FPS regardless of game state
+	love.graphics.setFont(retroFont)
+	love.graphics.setColor(0, 1, 0, 1)
+	love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 5, 5)
 end
