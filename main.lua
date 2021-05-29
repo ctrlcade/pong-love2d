@@ -129,6 +129,20 @@ function love.update(dt)
 		end
 	end
 
+	-- if the ball reaches the left or right screen boundaries then
+	-- the game resets and updates the scores
+	if ball.x < 0 then
+		player2Score = player2Score + 1
+		ball:reset()
+		gameState = 'start'
+	end
+
+	if ball.x > VIRTUAL_WIDTH then
+		player1Score = player1Score + 1
+		ball:reset()
+		gameState = 'start'
+	end
+
 	-- player 1 movement handling
 	if love.keyboard.isDown('w') then
 		player1.dy = -PADDLE_SPEED
