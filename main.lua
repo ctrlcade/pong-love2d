@@ -88,6 +88,47 @@ end
 that has elapsed since the last frame, this is already supplied by LÖVE 
 ]]
 function love.update(dt)
+
+	if gameState == 'play' then
+		-- detects collision of ball with the paddles, reverses dx if true and slightly
+		-- increases the ball's velocity, then alters the dy based on collision position
+		if ball:collides(player1) then
+			ball.dx = -ball.dx * 1.03
+			ball.x = player1.x + 5
+
+			-- keep velocity going in the same direction but randomize it
+			if ball.dy < 0 then
+				ball.dy = -math.random(10, 150)
+			else
+				ball.dy = math.random(10, 150)
+			end
+		end
+		
+		if ball:collides(player2) then
+			ball.dx = -ball.dx * 1.03
+			ball.x = player2.x - 4
+
+			-- keep velocity going in the same direction but randomize it
+			if ball.dy < 0 then
+				ball.dy = -math.random(10, 150)
+			else
+				ball.dy = math.random(10, 150)
+			end
+		end
+
+		-- detect upper and lower screen boundary collisions and reverse if collided with
+		if ball.y <= 0 then
+			ball.y = 0
+			ball.dy = -ball.dy
+		end
+
+		-- -4 to account for the ball's size
+		if ball.y >= VIRTUAL_HEIGHT - 4 then
+			ball.y = VIRTUAL_HEIGHT - 4
+			ball.dy = -ball.dy
+		end
+	end
+
 	-- player 1 movement handling
 	if love.keyboard.isDown('w') then
 		player1.dy = -PADDLE_SPEED
