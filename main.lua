@@ -94,7 +94,7 @@ function love.update(dt)
 		player2Y = math.max(0, player2Y + -PADDLE_SPEED * dt)
 	elseif love.keyboard.isDown('down') then
 		-- add positive paddle speed (down = Y) to the current Y multiplied by deltaTime (dt)
-		player2Y = math.min(VIRTUAL_HEIGHT, player2Y + PADDLE_SPEED * dt)
+		player2Y = math.min(VIRTUAL_HEIGHT - 20, player2Y + PADDLE_SPEED * dt)
 	end
 
 	-- updates the ball based on its DX and DY values only if in the play state;
