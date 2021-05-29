@@ -151,7 +151,7 @@ function love.update(dt)
 
 			-- if a score of 10 has been reached then the game is over, sets the
 			-- state to finished so the victory message can be displayed
-			if player2Score == 2 then
+			if player2Score == 10 then
 				winningPlayer = 2
 				gameState = 'finished'
 				ball:reset()
@@ -165,7 +165,7 @@ function love.update(dt)
 		if ball.x > VIRTUAL_WIDTH then
 			servingPlayer = 2
 			player1Score = player1Score + 1
-			if player1Score == 2 then
+			if player1Score == 10 then
 				winningPlayer = 1
 				gameState = 'finished'
 				ball:reset()
