@@ -60,6 +60,14 @@ function love.load()
 	-- sets LÖVE's active font to the one specified in the retroFont object
 	love.graphics.setFont(retroFont)
 
+	-- setup game sound effects, later we can just index into this table and call 
+	-- each entry's 'play' method
+	sounds = {
+		['Paddle-Bounce'] = love.audio.newSource('sounds/Paddle-Bounce.wav', 'static'),
+		['Wall-Bounce'] = love.audio.newSource('sounds/Wall-Bounce.wav', 'static'),
+		['Score'] = love.audio.newSource('sounds/Score.wav', 'static')
+	}
+
 	-- initialises the virutal resolution which is rendered within the actual window
 	-- regardless of its dimensions, replaces the love.window.setMode call previously used
 	push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, { 
@@ -117,6 +125,8 @@ function love.update(dt)
 			else
 				ball.dy = math.random(10, 150)
 			end
+
+			sounds['Paddle-Bounce']:play()
 		end
 		
 		if ball:collides(player2) then
@@ -129,18 +139,22 @@ function love.update(dt)
 			else
 				ball.dy = math.random(10, 150)
 			end
+
+			sounds['Paddle-Bounce']:play()
 		end
 
 		-- detect upper and lower screen boundary collisions and reverse if collided with
 		if ball.y <= 0 then
 			ball.y = 0
 			ball.dy = -ball.dy
+			sounds['Wall-Bounce']:play()
 		end
 
 		-- -4 to account for the ball's size
 		if ball.y >= VIRTUAL_HEIGHT - 4 then
 			ball.y = VIRTUAL_HEIGHT - 4
 			ball.dy = -ball.dy
+			sounds['Wall-Bounce']:play()
 		end
 
 		-- if the ball reaches the left or right screen boundaries then
@@ -148,6 +162,7 @@ function love.update(dt)
 		if ball.x < 0 then
 			servingPlayer = 1
 			player2Score = player2Score + 1
+			sounds['Score']:play()
 
 			-- if a score of 10 has been reached then the game is over, sets the
 			-- state to finished so the victory message can be displayed
@@ -165,6 +180,8 @@ function love.update(dt)
 		if ball.x > VIRTUAL_WIDTH then
 			servingPlayer = 2
 			player1Score = player1Score + 1
+			sounds['Score']:play()
+
 			if player1Score == 10 then
 				winningPlayer = 1
 				gameState = 'finished'
